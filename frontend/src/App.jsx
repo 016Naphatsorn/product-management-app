@@ -1,15 +1,22 @@
-import { useState } from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from "react-router";
 
-import './App.css'
+import AddProductPage from "./page/AddProductPage.jsx";
+import EditProductPage from "./page/EditProductPage.jsx";
+import ProductPage from "./page/productPage.jsx";
 
-function App() {
-  const [count, setCount] = useState(0)
-
+const App = () => {
   return (
-    <>
-      <button className="btn">Default</button>
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Navigate to="/products" replace />} />
+
+        <Route path="/products" element={<ProductPage />} />
+        <Route path="/products/add" element={<AddProductPage />} />
+        <Route path="/products/edit/:id" element={<EditProductPage />} />
+        <Route path="*" element={<Navigate to="/products" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
-}
-      
-export default App
+};
+
+export default App;
