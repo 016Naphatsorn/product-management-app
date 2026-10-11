@@ -5,30 +5,43 @@ import { connectDB } from "./config/database.js";
 
 dotenv.config();
 
-const PORT = process.env.PORT || process.env.BACKEND_PORT || 5000;
-
 const app = express();
+
+const PORT = Number(
+  process.env.PORT || process.env.BACKEND_PORT || 5000
+);
 
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
-  return res
-    .status(200)
-    .send("<h1>Welcome to RESTful API Product Management App</h1>");
+  res.status(200).send(
+    "<h1>Welcome to RESTful API Product Management App</h1>"
+  );
 });
 
-const startServer = async () => {
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "OK",
+    message: "Backend is running",
+  });
+});
+
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+
+async function startDatabase() {
   try {
     await connectDB();
-
-    app.listen(PORT, "0.0.0.0", () => {
-      console.log(`Server is running on port ${PORT}`);
-    });
+    console.log("Database connected successfully");
   } catch (error) {
-    console.error("Failed to start server:", error.message);
-    process.exit(1);
+    console.error(
+      "Database connection failed:",
+      error.message
+    );
   }
-};
+}
 
-startServer();
+startDatabase();
