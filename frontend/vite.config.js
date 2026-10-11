@@ -2,7 +2,6 @@ import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import tailwindcss from "@tailwindcss/vite";
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
@@ -14,5 +13,8 @@ export default defineConfig({
   optimizeDeps: {
     include: ["react-router"],
     force: true,
+  },
+  build: {
+    chunkSizeWarningLimit: 600,
   },
 });
