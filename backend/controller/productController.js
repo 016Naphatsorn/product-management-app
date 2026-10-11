@@ -1,4 +1,6 @@
+
 import Product from "../model/productModules.js";
+
 
 const createProduct = async (req, res, next) => {
   try {
