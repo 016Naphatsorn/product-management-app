@@ -4,38 +4,56 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const sequelize = process.env.DATABASE_URL
-  ? new Sequelize(process.env.DATABASE_URL, {
-      dialect: "postgres",
-      logging: false,
-      dialectOptions: {
+const isProduction = process.env.NODE_ENV === "production";
+
+const databaseUrl = process.env.DATABASE_URL;
+
+// ตั้งค่าการเชื่อมต่อ PostgreSQL
+const options = {
+  dialect: "postgres",
+  logging: false,
+  dialectOptions: isProduction
+    ? {
         ssl: {
           require: true,
           rejectUnauthorized: false,
         },
-      },
-    })
-  : new Sequelize(
-      process.env.DB_NAME,
-      process.env.DB_USER,
-      process.env.DB_PASSWORD,
-      {
-        host: process.env.DB_HOST,
-        port: Number(process.env.DB_PORT) || 5432,
-        dialect: "postgres",
-        logging: false,
       }
-    );
+    : {},
+};
 
+let sequelize;
+
+if (databaseUrl) {
+  // ใช้ DATABASE_URL จาก Render
+  sequelize = new Sequelize(databaseUrl, options);
+} else {
+  // ใช้ค่าฐานข้อมูลจาก .env
+  sequelize = new Sequelize(
+    process.env.DB_NAME,
+    process.env.DB_USER,
+    process.env.DB_PASSWORD,
+    {
+      ...options,
+      host: process.env.DB_HOST || "localhost",
+      port: Number(process.env.DB_PORT) || 5432,
+    }
+  );
+}
+
+// เชื่อมต่อฐานข้อมูล
 const connectDB = async () => {
   try {
+    console.log("Connecting to PostgreSQL...");
+
     await sequelize.authenticate();
-    console.log("Connected to PostgreSQL!");
+    console.log("PostgreSQL connected successfully!");
 
     await sequelize.sync();
-    console.log("Table Synchronized!");
+    console.log("Database tables synchronized!");
   } catch (error) {
-    console.error("Connection failed:", error.message);
+    console.error("PostgreSQL connection failed:");
+    console.error(error.message);
     throw error;
   }
 };
