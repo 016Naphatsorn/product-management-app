@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { connectDB } from "./config/database.js";
+import productRouter from "./router/productRouter.js";
 
 dotenv.config();
 
@@ -28,20 +29,20 @@ app.get("/health", (req, res) => {
   });
 });
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+app.use("/api/products", productRouter);
 
-async function startDatabase() {
+async function startServer() {
   try {
     await connectDB();
     console.log("Database connected successfully");
+
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
   } catch (error) {
-    console.error(
-      "Database connection failed:",
-      error.message
-    );
+    console.error("Failed to start server:", error.message);
+    process.exit(1);
   }
 }
 
-startDatabase();
+startServer();
